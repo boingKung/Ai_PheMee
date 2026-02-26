@@ -98,4 +98,41 @@ if selected == 'Used_cars':
     st.success(Price_predict)
     
 if selected == 'bmi':
-    st.title('ประเมิน Bmi')
+    st.title('ประเมิน BMI')
+    
+    # 1. สร้างตัวเลือกสำหรับเพศ (0 หรือ 1 ตามข้อมูลในตาราง)
+    gender_input = st.selectbox('เพศ', ['หญิง', 'ชาย'])
+    gender_val = 1 if gender_input == 'ชาย' else 0
+    
+    # 2. รับค่าส่วนสูงและน้ำหนัก
+    height_val = st.text_input('ส่วนสูง (cm)')
+    weight_val = st.text_input('น้ำหนัก (kg)')
+    
+    bmi_prediction_result = ''
+    
+    if st.button('Predict'):
+        # ตรวจสอบว่ากรอกข้อมูลครบถ้วนหรือไม่
+        if height_val and weight_val:
+            # 3. ใช้ bmi_model ในการทำนาย
+            # ส่งค่า [Gender, Height, Weight] ตามลำดับในรูปภาพข้อมูลของคุณ
+            prediction = bmi_model.predict([[
+                float(gender_val),
+                float(height_val),
+                float(weight_val)
+            ]])
+            
+            # 4. แปลงผลลัพธ์ที่เป็นตัวเลข (Index) ให้เป็นคำอ่าน (อ้างอิงตามเกณฑ์มาตรฐาน)
+            bmi_index = prediction[0]
+            bmi_labels = {
+                0: 'Extremely Weak (ผอมมาก)',
+                1: 'Weak (ผอม)',
+                2: 'Normal (ปกติ)',
+                3: 'Overweight (น้ำหนักเกิน)',
+                4: 'Obesity (อ้วน)',
+                5: 'Extreme Obesity (อ้วนอันตราย)'
+            }
+            
+            bmi_prediction_result = bmi_labels.get(bmi_index, f'Index: {bmi_index}')
+            st.success(f'ผลการประเมิน: {bmi_prediction_result}')
+        else:
+            st.error('กรุณากรอกข้อมูลให้ครบถ้วน')
